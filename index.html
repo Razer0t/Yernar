@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <title>Қонақтарға шақыру</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: auto;
+    }
+    .hidden {
+      display: none;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Қонақтарға шақыру</h2>
+  <p>Төмендегі анкетаны толтырыңыз:</p>
+  <form id="rsvpForm">
+    <label>Қатысуыңызды таңдаңыз:</label>
+    <select name="response" id="response" required>
+      <option value="">-- Таңдаңыз --</option>
+      <option value="Барамын">Барамын</option>
+      <option value="Бармаймын">Бармаймын</option>
+      <option value="Жұбайыммен келемін">Жұбайыммен келемін</option>
+    </select>
+
+    <div id="nameField" class="hidden">
+      <label>Атыңызды енгізіңіз:</label>
+      <input type="text" name="name" id="nameInput" placeholder="Атыңыз" />
+    </div>
+
+    <button type="submit">Жіберу</button>
+  </form>
+
+  <p id="statusMsg"></p>
+
+  <script>
+    const form = document.getElementById("rsvpForm");
+    const responseSelect = document.getElementById("response");
+    const nameField = document.getElementById("nameField");
+    const nameInput = document.getElementById("nameInput");
+    const statusMsg = document.getElementById("statusMsg");
+
+    responseSelect.addEventListener("change", () => {
+      const val = responseSelect.value;
+      if (val === "Барамын" || val === "Жұбайыммен келемін") {
+        nameField.classList.remove("hidden");
+        nameInput.required = true;
+      } else {
+        nameField.classList.add("hidden");
+        nameInput.required = false;
+        nameInput.value = "";
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = {
+        response: responseSelect.value,
+        name: nameInput.value
+      };
+
+      fetch("https://script.google.com/macros/s/ВАШ_WEBAPP_URL/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.text())
+      .then(msg => {
+        statusMsg.textContent = "Рақмет! Жауабыңыз сақталды.";
+        form.reset();
+        nameField.classList.add("hidden");
+      })
+      .catch(err => {
+        statusMsg.textContent = "Қате орын алды. Қайталап көріңіз.";
+        console.error(err);
+      });
+    });
+  </script>
+</body>
+</html>
